@@ -16,7 +16,7 @@ class PropertyController extends AbstractController
         $this->repo = $repo;
     }
 
-    #[Route('/biens', name: 'app_property.index')]
+    #[Route('/biens', name: 'app.property.index')]
     public function index(): Response
     {
         return $this->render('properties/index.html.twig', [
@@ -24,7 +24,7 @@ class PropertyController extends AbstractController
         ]);
     }
 
-    #[Route('/bien/{slug}-{id}', name: 'app_property.show', requirements: ["slug" => "[a-z0-9\-]*"])]
+    #[Route('/bien/{slug}-{id}', name: 'app.property.show', requirements: ["slug" => "[a-z0-9\-]*"])]
     public function show($slug, $id): Response
     {
         $property = $this->repo->find($id);

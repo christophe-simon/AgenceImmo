@@ -11,8 +11,10 @@ use Cocur\Slugify\Slugify;
 class Property
 {
     const HEAT = [
-        0 => 'Electrique',
-        1 => 'Gaz'
+        0 => 'Bois',
+        1 => 'Electrique',
+        2 => 'Fioul',
+        3 => 'Gaz'
     ];
     
     #[ORM\Id]
@@ -61,7 +63,7 @@ class Property
 
     public function __construct()
     {
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
