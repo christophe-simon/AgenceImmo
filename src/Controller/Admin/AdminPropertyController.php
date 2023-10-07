@@ -30,8 +30,8 @@ class AdminPropertyController extends AbstractController
         return $this->render('admin/properties/index.html.twig', compact('properties'));
     }
 
-    #[Route('/admin/property/create', name: 'app.admin.property.new')]
-    public function new(Request $request)
+    #[Route('/admin/property', name: 'app.admin.property.create', methods:['GET', 'POST'])]
+    public function create(Request $request)
     {
         $property = new Property();
         $form = $this->createForm(PropertyType::class, $property);
@@ -50,22 +50,24 @@ class AdminPropertyController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/property/{id}', name: 'app.admin.property.delete', methods:["DELETE"])]
+    #[Route('/admin/property/{id}', name: 'app.admin.property.delete', methods:['DELETE'])]
     public function delete(Property $property, Request $request)
     {
-        // if ($this->isCsrfTokenValid('delete' . $property->getId(), $request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $property->getId(), $request->get('_token'))) {
             $this->em->remove($property);
             $this->em->flush();
             $this->addFlash('success', 'Bien supprimé avec succès');
             // dump('Condition remplie');
-        // }
+        }
         return $this->redirectToRoute('app.admin.property.index');
     }
 
-    #[Route('/admin/property/{id}', name: 'app.admin.property.edit', methods:["GET", "POST"])]
-    public function edit(Property $property, Request $request)
+    #[Route('/admin/property/{id}', name: 'app.admin.property.update', methods:['GET', 'PATCH'])]
+    public function update(Property $property, Request $request)
     {
-        $form = $this->createForm(PropertyType::class, $property);
+        $form = $this->createForm(PropertyType::class, $property, [
+            'method' => 'PATCH'
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
