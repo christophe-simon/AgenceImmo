@@ -6,6 +6,7 @@ use App\Repository\PropertyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Cocur\Slugify\Slugify;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 class Property
@@ -16,6 +17,7 @@ class Property
         2 => 'Fioul',
         3 => 'Gaz'
     ];
+    const POSTAL_CODE_REGEX = '/^[0-9]{5}$/';
     
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -23,9 +25,19 @@ class Property
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        min: 5,
+        max: 255,
+        minMessage: "Le titre doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le titre ne peut pas contenir plus de {{ limit }} caractères."
+    )]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        min: 100,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères."
+    )]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -53,6 +65,10 @@ class Property
     private ?string $address = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Regex(
+        pattern: self::POSTAL_CODE_REGEX,
+        message: "Le code postal doit être composé de 5 chiffres."
+    )]
     private ?string $postalCode = null;
 
     #[ORM\Column(type: 'boolean', options: ["default" => false])]
