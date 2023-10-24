@@ -14,7 +14,7 @@ final class Version20231005155031 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Add property table with id, title and description fields';
     }
 
     public function up(Schema $schema): void

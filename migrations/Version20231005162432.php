@@ -14,7 +14,7 @@ final class Version20231005162432 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Add surface, rooms, bedrooms, floor, price, heat, city, address, postal_code, sold and created_at fields at the property fields';
     }
 
     public function up(Schema $schema): void

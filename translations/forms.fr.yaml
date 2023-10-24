@@ -1,7 +1,7 @@
 Title: Titre
-Rooms: Pièces
-Bedrooms: Chambres
-Floor: Etages
+Rooms: Nb de pièces
+Bedrooms: Nb de chambres
+Floor: Etage
 Heat: Chauffage
 Price: Prix
 City: Ville

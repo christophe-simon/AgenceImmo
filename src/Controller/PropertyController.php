@@ -19,7 +19,7 @@ class PropertyController extends AbstractController
     #[Route('/biens', name: 'app.property.index')]
     public function index(): Response
     {
-        return $this->render('properties/index.html.twig', [
+        return $this->render('property/index.html.twig', [
             'current_menu' => 'properties'
         ]);
     }
@@ -30,13 +30,13 @@ class PropertyController extends AbstractController
         $property = $this->repo->find($id);
 
         if ($property->getSlug() !== $slug) {
-            return $this->redirectToRoute('app_property.show', [
+            return $this->redirectToRoute('app.property.show', [
                 'id' => $property->getId(),
                 'slug' => $property->getSlug()
             ], 301);
         }
 
-        return $this->render('properties/show.html.twig', [
+        return $this->render('property/show.html.twig', [
             'property' => $property,
             'current_menu' => 'properties'
         ]);
