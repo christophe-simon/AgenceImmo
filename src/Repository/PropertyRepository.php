@@ -25,7 +25,7 @@ class PropertyRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Property[] Returns an array of Property objects
+     * @return Query
      */
     public function findAllVisibleQuery(PropertySearch $search): Query
     {
@@ -41,6 +41,16 @@ class PropertyRepository extends ServiceEntityRepository
             $query = $query
                 ->andWhere('p.surface >= :minsurface')
                 ->setParameter('minsurface', $search->getMinSurface());
+        }
+
+        if ($search->getOptions()->count() > 0) {
+            $k = 0;
+            foreach ($search->getOptions() as $option) {
+                $k++;
+                $query = $query
+                    ->andWhere(":option$k MEMBER OF p.options")
+                    ->setParameter("option$k", $option);
+            }
         }
 
         return $query->getQuery();

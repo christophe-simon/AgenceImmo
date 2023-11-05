@@ -30,8 +30,8 @@ class AgencyPropertyController extends AbstractController
         return $this->render('agency/property/index.html.twig', compact('properties'));
     }
 
-    #[Route('/agency/property', name: 'app.agency.property.create', methods:['GET', 'POST'])]
-    public function create(Request $request)
+    #[Route('/agency/property', name: 'app.agency.property.new', methods:['GET', 'POST'])]
+    public function new(Request $request)
     {
         // $this->denyAccessUnlessGranted('edit');
         $property = new Property();

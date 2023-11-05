@@ -14,7 +14,7 @@ final class Version20231023204407 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Change roles management (JSON instead of fields in a table) and change first name and last name typo';
     }
 
     public function up(Schema $schema): void

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PropertyRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Cocur\Slugify\Slugify;
@@ -11,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 class Property
 {
-    const HEAT = [
+    const HEATING = [
         0 => 'Bois',
         1 => 'Electrique',
         2 => 'Fioul',
@@ -56,7 +58,7 @@ class Property
     private ?int $price = null;
 
     #[ORM\Column]
-    private ?int $heat = null;
+    private ?int $heating = null;
 
     #[ORM\Column(length: 255)]
     private ?string $city = null;
@@ -77,9 +79,13 @@ class Property
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\ManyToMany(targetEntity: Option::class, inversedBy: 'properties')]
+    private Collection $options;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->options = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -181,21 +187,21 @@ class Property
         return number_format($this->price, 0, '', ' ');
     }
 
-    public function getHeat(): ?int
+    public function getHeating(): ?int
     {
-        return $this->heat;
+        return $this->heating;
     }
 
-    public function setHeat(int $heat): static
+    public function setHeating(int $heating): static
     {
-        $this->heat = $heat;
+        $this->heating = $heating;
 
         return $this;
     }
 
-    public function getHeatType(): string
+    public function getHeatingType(): string
     {
-        return self::HEAT[$this->heat];
+        return self::HEATING[$this->heating];
     }
 
     public function getCity(): ?string
@@ -254,6 +260,33 @@ class Property
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Option>
+     */
+    public function getOptions(): Collection
+    {
+        return $this->options;
+    }
+
+    public function addOption(Option $option): static
+    {
+        if (!$this->options->contains($option)) {
+            $this->options->add($option);
+            $option->addProperty($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOption(Option $option): static
+    {
+        if ($this->options->removeElement($option)) {
+            $option->removeProperty($this);
+        }
 
         return $this;
     }

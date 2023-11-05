@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title 'Gérer les biens' %}
+{% block title 'Gérer les options' %}
 
 {% block body %}
     <div class="container mt-4">
 
-        <h1>Gérer les biens</h1>
+        <h1>Gérer les options</h1>
 
         {% for message in app.flashes('success') %}
             <div class="alert alert-success">
@@ -16,20 +16,20 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Titre</th>
+                    <th>Nom</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for property in properties %}
+                {% for option in options %}
                     <tr>
-                        <td>{{ property.title }}</td>
+                        <td>{{ option.name }}</td>
                         <td>
-                            <a href="{{ path('app.agency.property.edit', {id: property.id}) }}" class="btn btn-secondary">Editer</a>
+                            <a href="{{ path('app.agency.option.edit', {id: option.id}) }}" class="btn btn-secondary">Editer</a>
 
-                            <form method="post" action="{{ path('app.agency.property.delete', {id: property.id}) }}" style="display: inline-block" onsubmit="return confirm('Êtes vous vraiment sûr ?')">
+                            <form method="post" action="{{ path('app.agency.property.delete', {id: option.id}) }}" style="display: inline-block" onsubmit="return confirm('Êtes vous vraiment sûr ?')">
                                 <input type="hidden" name="_method" value="DELETE">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ property.id) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ option.id) }}">
                                 <button class="btn btn-danger">Supprimer</button>
                             </form>
 
@@ -40,9 +40,8 @@
         </table>
 
         <div class="text-right">
-            <a href="{{ path('app.agency.property.new') }}" class="btn btn-primary">Créer un nouveau bien</a>
+            <a href="{{ path('app.agency.option.new') }}" class="btn btn-primary">Créer une nouvelle option</a>
         </div>
 
     </div>
 {% endblock %}
-
