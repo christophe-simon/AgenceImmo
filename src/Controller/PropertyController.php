@@ -2,9 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Contact;
+use App\Entity\Property;
+use App\Form\ContactType;
 use App\Entity\PropertySearch;
 use App\Form\PropertySearchType;
 use App\Repository\PropertyRepository;
+use App\Notification\ContactNotification;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,10 +44,8 @@ class PropertyController extends AbstractController
     }
 
     #[Route('/bien/{slug}-{id}', name: 'app.property.show', requirements: ["slug" => "[a-z0-9\-]*"])]
-    public function show($slug, $id): Response
+    public function show(Property $property, string $slug, Request $request, ContactNotification $notification): Response
     {
-        $property = $this->repo->find($id);
-
         if ($property->getSlug() !== $slug) {
             return $this->redirectToRoute('app.property.show', [
                 'id' => $property->getId(),
@@ -51,27 +53,24 @@ class PropertyController extends AbstractController
             ], 301);
         }
 
+        $contact = new Contact();
+        $contact->setProperty($property);
+        $form = $this->createForm(ContactType::class, $contact);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $notification->notify($contact);
+            $this->addFlash('success', 'Votre email a bien été envoyé');
+            return $this->redirectToRoute('app.property.show', [
+                'id'   => $property->getId(),
+                'slug' => $property->getSlug()
+            ]);
+        }
+
         return $this->render('property/show.html.twig', [
             'property' => $property,
-            'current_menu' => 'properties'
+            'current_menu' => 'properties',
+            'form'         => $form->createView()
         ]);
     }
-
-    /**
-     * @Route("/biens/{slug}-{id}", name="property.show", requirements={"slug": "[a-z0-9\-]*"})
-     */
-    // public function show(Property $property, string $slug): Response
-    // {
-    //     if ($property->getSlug() !== $slug) {
-    //         return $this->redirectToRoute('property.show', [
-    //             'id' => $property->getId(),
-    //             'slug' => $property->getSlug()
-    //         ], 301);
-    //     }
-    //     return $this->render('property/show.html.twig', [
-    //         'property' => $property,
-    //         'current_menu' => 'properties'
-    //     ]);
-    // }
-
 }

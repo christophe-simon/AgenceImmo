@@ -4,7 +4,6 @@ namespace App\Listener;
 
 use App\Entity\Property;
 use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
@@ -32,7 +31,7 @@ class ImageCacheSubscriber implements EventSubscriber
 
     public function preRemove(LifecycleEventArgs $args)
     {
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
 
         if (!$entity instanceof Property) {
             return;
@@ -42,7 +41,7 @@ class ImageCacheSubscriber implements EventSubscriber
 
     public function preUpdate(PreUpdateEventArgs $args)
     {
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
 
         if (!$entity instanceof Property) {
             return;
