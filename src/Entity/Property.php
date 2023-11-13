@@ -8,16 +8,14 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PropertyRepository;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
-#[Vich\Uploadable]
 #[UniqueEntity(fields: ["title"], message: "Un autre bien possède déjà ce titre, veuillez en choisir un autre.")]
+#[Vich\Uploadable]
 class Property
 {
     const HEATING = [
@@ -32,15 +30,6 @@ class Property
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    private ?string $fileName = null;
-
-    #[Vich\UploadableField(mapping: 'property_image', fileNameProperty: 'filename')]
-    #[Assert\Image(
-        mimeTypes: ["image/jpeg"]
-    )]
-    private ?File $imageFile = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\Length(
@@ -101,40 +90,24 @@ class Property
     #[ORM\Column]
     private ?DateTimeImmutable $updatedAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'property', targetEntity: Picture::class, orphanRemoval: true, cascade: ["persist"])]
+    private Collection $pictures;
+
+    #[Assert\All([
+        new Assert\Image(mimeTypes: ["image/jpeg"])
+    ])]
+    private $pictureFiles;
+
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable();
         $this->options = new ArrayCollection();
+        $this->pictures = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getFileName(): ?string
-    {
-        return $this->fileName;
-    }
-
-    public function setFileName(?string $fileName): static
-    {
-        $this->fileName = $fileName;
-        return $this;
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
-    }
-
-    public function setImageFile(?File $imageFile): static
-    {
-        $this->imageFile = $imageFile;
-        if ($this->imageFile instanceof UploadedFile) {
-            $this->updatedAt = new DateTimeImmutable('now');
-        }
-        return $this;
     }
 
     public function getTitle(): ?string
@@ -344,6 +317,60 @@ class Property
     {
         $this->updatedAt = $updatedAt;
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Picture>
+     */
+    public function getPictures(): Collection
+    {
+        return $this->pictures;
+    }
+
+    public function getPicture(): ?Picture
+    {
+        if ($this->pictures->isEmpty()) {
+            return null;
+        }
+        return $this->pictures->first();
+    }
+
+    public function addPicture(Picture $picture): static
+    {
+        if (!$this->pictures->contains($picture)) {
+            $this->pictures->add($picture);
+            $picture->setProperty($this);
+        }
+
+        return $this;
+    }
+
+    public function removePicture(Picture $picture): static
+    {
+        if ($this->pictures->removeElement($picture)) {
+            // set the owning side to null (unless already changed)
+            if ($picture->getProperty() === $this) {
+                $picture->setProperty(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPictureFiles()
+    {
+        return $this->pictureFiles;
+    }
+
+    public function setPictureFiles($pictureFiles): static
+    {
+        foreach($pictureFiles as $pictureFile) {
+            $picture = new Picture();
+            $picture->setImageFile($pictureFile);
+            $this->addPicture($picture);
+        }
+        $this->pictureFiles = $pictureFiles;
         return $this;
     }
 }
